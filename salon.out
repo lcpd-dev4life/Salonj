@@ -1,0 +1,176 @@
+#include <iostream>
+#include <map>
+#include <set>
+using namespace std;
+
+class Salon {
+private:
+    map<int, string> programari; // Ora -> Nume client
+    
+public:
+    void adaugaProgramare(int ora, const string& nume) {
+        if (programari.count(ora) == 0) {
+            programari[ora] = nume;
+            cout << "Programare adaugata la ora " << ora << " pentru " << nume << "\n";
+        } else {
+            cout << "Ora " << ora << " este deja rezervata!\n";
+        }
+    }
+    
+    void stergeProgramare(int ora) {
+        if (programari.erase(ora)) {
+            cout << "Programare la ora " << ora << " stearsa.\n";
+        } else {
+            cout << "Nu exista programare la ora " << ora << "!\n";
+        }
+    }
+    
+    void afiseazaProgramari() {
+        if (programari.empty()) {
+            cout << "Nu exista programari.\n";
+        } else {
+            for (const auto& p : programari) {
+                cout << "Ora: " << p.first << " - Client: " << p.second << "\n";
+            }
+        }
+    }
+    
+    void modificaProgramare(int ora, const string& numeNou) {
+        if (programari.count(ora)) {
+            programari[ora] = numeNou;
+            cout << "Programarea la ora " << ora << " a fost modificata pentru " << numeNou << "\n";
+        } else {
+            cout << "Nu exista programare la ora " << ora << "!\n";
+        }
+    }
+    
+    bool verificaDisponibilitate(int ora) {
+        return programari.count(ora) == 0;
+    }
+    
+    int numarTotalProgramari() {
+        return programari.size();
+    }
+    
+    void cautaClient(const string& nume) {
+        bool gasit = false;
+        for (const auto& p : programari) {
+            if (p.second == nume) {
+                cout << "Clientul " << nume << " are programare la ora " << p.first << "\n";
+                gasit = true;
+            }
+        }
+        if (!gasit) {
+            cout << "Clientul " << nume << " nu are programari.\n";
+        }
+    }
+    
+    void afiseazaClienti() {
+        set<string> clienti;
+        for (const auto& p : programari) {
+            clienti.insert(p.second);
+        }
+        if (clienti.empty()) {
+            cout << "Nu exista clienti cu programari.\n";
+        } else {
+            for (const auto& client : clienti) {
+                cout << client << "\n";
+            }
+        }
+    }
+    
+    void afiseazaOreLibere(int start, int sfarsit) {
+        for (int i = start; i <= sfarsit; ++i) {
+            if (verificaDisponibilitate(i)) {
+                cout << "Ora libera: " << i << "\n";
+            }
+        }
+    }
+    
+    void verificaInterval(int start, int sfarsit) {
+        bool liber = true;
+        for (int i = start; i <= sfarsit; ++i) {
+            if (!verificaDisponibilitate(i)) {
+                cout << "Ora " << i << " este ocupata.\n";
+                liber = false;
+            }
+        }
+        if (liber) {
+            cout << "Intervalul " << start << " - " << sfarsit << " este disponibil.\n";
+        } else {
+            cout << "Intervalul " << start << " - " << sfarsit << " nu este complet disponibil.\n";
+        }
+    }
+};
+
+int main() {
+    Salon salon;
+    int optiune, ora, start, sfarsit;
+    string nume;
+    
+    do {
+        cout << "\nMeniu:\n";
+        cout << "1. Adauga programare\n2. Sterge programare\n3. Afiseaza programari\n4. Modifica programare\n";
+        cout << "5. Verifica disponibilitate\n6. Afiseaza numar total programari\n7. Cauta client\n";
+        cout << "8. Afiseaza lista clienti\n9. Afiseaza ore libere\n10. Verifica interval\n0. Iesire\n";
+        cout << "Alege optiunea: ";
+        cin >> optiune;
+        
+        switch (optiune) {
+            case 1:
+                cout << "Introdu ora si numele clientului: ";
+                cin >> ora >> ws;
+                getline(cin, nume);
+                salon.adaugaProgramare(ora, nume);
+                break;
+            case 2:
+                cout << "Introdu ora programarii de sters: ";
+                cin >> ora;
+                salon.stergeProgramare(ora);
+                break;
+            case 3:
+                salon.afiseazaProgramari();
+                break;
+            case 4:
+                cout << "Introdu ora si noul nume: ";
+                cin >> ora >> ws;
+                getline(cin, nume);
+                salon.modificaProgramare(ora, nume);
+                break;
+            case 5:
+                cout << "Introdu ora: ";
+                cin >> ora;
+                cout << (salon.verificaDisponibilitate(ora) ? "Disponibil\n" : "Ocupat\n");
+                break;
+            case 6:
+                cout << "Numar total de programari: " << salon.numarTotalProgramari() << "\n";
+                break;
+            case 7:
+                cout << "Introdu numele clientului: ";
+                cin >> ws;
+                getline(cin, nume);
+                salon.cautaClient(nume);
+                break;
+            case 8:
+                salon.afiseazaClienti();
+                break;
+            case 9:
+                cout << "Introdu intervalul (start sfarsit): ";
+                cin >> start >> sfarsit;
+                salon.afiseazaOreLibere(start, sfarsit);
+                break;
+            case 10:
+                cout << "Introdu intervalul (start sfarsit): ";
+                cin >> start >> sfarsit;
+                salon.verificaInterval(start, sfarsit);
+                break;
+            case 0:
+                cout << "Iesire...\n";
+                break;
+            default:
+                cout << "Optiune invalida!\n";
+        }
+    } while (optiune != 0);
+    
+    return 0;
+}
